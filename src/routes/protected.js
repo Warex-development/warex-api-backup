@@ -525,6 +525,115 @@ router.put('/admin/users/:id/role', verifyToken, async (req, res) => {
 });
 
 /**
+ * @route   PUT /api/protected/admin/users/:id
+ * @desc    Update user details (admin only)
+ * @access  Admin Only
+ */
+router.put('/admin/users/:id', verifyToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Unauthorized: Admin only' });
+    }
+
+    const { id } = req.params;
+    const {
+      full_name,
+      company_name,
+      email,
+      mobile,
+      vat_number,
+      industry,
+      industry_other,
+      country,
+      mode,
+      member_mode,
+      plan,
+      status
+    } = req.body;
+
+    const updates = [];
+    const values = [];
+    let paramIdx = 1;
+
+    if (full_name !== undefined) {
+      updates.push(`full_name = $${paramIdx++}`);
+      values.push(full_name.trim());
+    }
+    if (company_name !== undefined) {
+      updates.push(`company_name = $${paramIdx++}`);
+      values.push(company_name.trim());
+    }
+    if (email !== undefined) {
+      updates.push(`email = $${paramIdx++}`);
+      values.push(email.trim().toLowerCase());
+    }
+    if (mobile !== undefined) {
+      updates.push(`mobile = $${paramIdx++}`);
+      values.push(mobile.trim());
+    }
+    if (vat_number !== undefined) {
+      const cleanVat = vat_number ? vat_number.replace(/^W-/i, '').trim() : vat_number;
+      updates.push(`vat_number = $${paramIdx++}`);
+      values.push(cleanVat);
+    }
+    if (industry !== undefined) {
+      updates.push(`industry = $${paramIdx++}`);
+      values.push(industry);
+    }
+    if (industry_other !== undefined) {
+      updates.push(`industry_other = $${paramIdx++}`);
+      values.push(industry_other);
+    }
+    if (country !== undefined) {
+      updates.push(`country = $${paramIdx++}`);
+      values.push(country);
+    }
+    const finalMode = mode || member_mode;
+    if (finalMode !== undefined) {
+      updates.push(`mode = $${paramIdx++}`);
+      values.push(finalMode);
+      updates.push(`member_mode = $${paramIdx++}`);
+      values.push(finalMode);
+    }
+    if (plan !== undefined) {
+      updates.push(`plan = $${paramIdx++}`);
+      values.push(plan);
+    }
+    if (status !== undefined) {
+      updates.push(`status = $${paramIdx++}`);
+      values.push(status);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields provided to update' });
+    }
+
+    updates.push(`updated_at = NOW()`);
+    values.push(id);
+
+    const query = `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramIdx} RETURNING id, first_name, last_name, full_name, email, role, status, company_name, vat_number, mobile, industry, industry_other, country, plan, mode, member_mode, created_at, (SELECT COUNT(*) FROM listings WHERE seller_id = users.id) as total_listings`;
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log(`✅ [ADMIN] Updated user ${id} (${result.rows[0].email})`);
+    return res.status(200).json({
+      message: 'Member details updated successfully',
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error('❌ [ADMIN] Error updating user:', error.message);
+    if (error.code === '23505') {
+      return res.status(400).json({ error: 'A user with this Email or VAT/Login ID already exists' });
+    }
+    return res.status(500).json({ error: 'Failed to update member: ' + error.message });
+  }
+});
+
+/**
  * @route   PUT /api/protected/admin/edit-approve/:id
  * @desc    Update user details and approve in one step
  * @access  Admin Only
