@@ -49,9 +49,25 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow non-browser requests (mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
+    
+    // Check explicit allowedOrigins list or wildcard
     if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       return callback(null, true);
     }
+
+    // Automatically allow any official WareXhub domain or Vercel preview
+    try {
+      const parsed = new URL(origin);
+      if (
+        parsed.hostname === 'warexhub.com' ||
+        parsed.hostname.endsWith('.warexhub.com') ||
+        parsed.hostname.endsWith('.vercel.app') ||
+        parsed.hostname === 'localhost'
+      ) {
+        return callback(null, true);
+      }
+    } catch (e) {}
+
     return callback(new Error(`CORS policy blocked access from origin: ${origin}`));
   },
   credentials: true
