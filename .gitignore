@@ -1,0 +1,181 @@
+################################################################################
+# DEPENDENCIES
+################################################################################
+node_modules/
+yarn.lock
+pnpm-lock.yaml
+.vercel/
+
+################################################################################
+# ENVIRONMENT & SECRETS (CRITICAL - Never commit sensitive data)
+################################################################################
+.env
+.env.*
+!.env.example
+
+
+################################################################################
+# LOGS & DEBUG
+################################################################################
+logs/
+*.log
+*.log.*
+npm-debug.log*
+npm-error.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+################################################################################
+# OPERATING SYSTEM & IDE FILES
+################################################################################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.vscode-server/
+.idea/
+.idea_modules/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.cer
+*.crt
+*.key
+
+################################################################################
+# BUILD & DISTRIBUTION ARTIFACTS
+################################################################################
+dist/
+build/
+out/
+.turbo/
+
+################################################################################
+# CACHE & TEMPORARY FILES
+################################################################################
+.cache/
+.next/
+.nuxt/
+.cache
+*.tmp
+*.temp
+.eslintcache
+
+################################################################################
+# DEVELOPMENT UTILITIES & SETUP SCRIPTS
+################################################################################
+# These files are for local development only and should not be deployed
+test-*.js
+check-*.js
+verify-*.js
+debug-*.js
+add-*.js
+approve-user.js
+create-demo-accounts.js
+create-admin.js
+create-prod-admin.js
+create_prod_sales_user.js
+create_sales_user.js
+create-tables.js
+TROUBLESHOOT.js
+fix-*.js
+fresh-start.js
+hard-reset.js
+setup-test-data.js
+demo-*.js
+delete-admin.js
+seed-*.js
+sync-*.js
+normalize-*.js
+trace-*.js
+pre-test-check.js
+final-validation.js
+fix-db-schema.js
+fix-requests-schema.js
+scripts/check_*.js
+scripts/test_*.js
+scripts/view_*.js
+scripts/inspect_*.js
+scripts/generate_*.js
+scripts/clean_*.js
+scripts/compare_*.js
+scripts/sync_*.js
+
+################################################################################
+# AUTO-GENERATED REPORTS & DIAGNOSTICS
+################################################################################
+# These are generated during development and debugging sessions
+*_REPORT.md
+CONNECTION_STATUS.md
+SETUP_STATUS.md
+BACKEND_VERIFICATION_REPORT.md
+USERS_TABLE_FIX_REPORT.md
+
+################################################################################
+# DATABASE UTILITIES (conditional - comment out if using in production)
+################################################################################
+# src/config/database-mock.js
+
+################################################################################
+# NODE.JS / RUNTIME
+################################################################################
+.npm
+.node_gyp
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+################################################################################
+# SYSTEM & MISC
+################################################################################
+.DS_Store
+*.bak
+*.swp
+.env.*.swp
+*ANALYSIS.md
+
+################################################################################
+# TEMP / DEBUG SCRIPTS (do not commit)
+################################################################################
+check_schema.js
+check-admin.js
+create_leads_table.js
+clear_*.js
+compare_*.js
+create_*.js
+get_*.js
+restore_*.js
+sync_*.js
+update_*.js
+
+# Temporary Scripts
+fix-*.cjs
+inject-modals.*
+db-migration.js
+*.cjs
+
+# Temporary Scripts & Generated Samples
+*.pdf
+insert_brands_categories.js
+scripts/*.py
+scripts/gen_*.js
+scripts/regen_*.js
+scripts/generate_and_render_*.js
+scripts/test_*.js
+scripts/send_*.js
+scripts/sample_*.pdf
+scripts/backfill*.js
+
