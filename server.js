@@ -441,6 +441,17 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+// Payload Too Large Error Handler (e.g. file upload > limit)
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large' || err.status === 413 || err.statusCode === 413 || err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      error: 'PAYLOAD_TOO_LARGE',
+      message: 'Backup server par 4.5 MB se badi file upload nahi ho sakti. Kripya file compress karein ya thodi der baad try karein.'
+    });
+  }
+  next(err);
+});
+
 // Global Error Handler (Sanitizes error output in production)
 app.use((err, req, res, next) => {
   console.error('💥 [Server Error]:', err);
@@ -451,7 +462,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
+// Start Server or Export for Serverless
 const startServer = async () => {
   try {
     console.log('\n========== WareX API Starting ==========');
@@ -461,11 +472,11 @@ const startServer = async () => {
     // Verify database connection first
     await verifyDatabaseConnection();
     
-    // Initialize database schema
-    await initializeDatabase();
-
-    // Seed default industries if empty
-    await seedDefaultIndustries();
+    // Initialize database schema (Skipped on Vercel cold starts)
+    if (!process.env.VERCEL) {
+      await initializeDatabase();
+      await seedDefaultIndustries();
+    }
     
     app.listen(PORT, () => {
       console.log(`✓ WareX API running on port ${PORT}`);
@@ -477,4 +488,10 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// In Vercel serverless environment, do not start HTTP listener; export app directly
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  startServer();
+}
+

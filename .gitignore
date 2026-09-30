@@ -97,6 +97,7 @@ demo-*.js
 delete-admin.js
 seed-*.js
 sync-*.js
+!scripts/sync-upstream.js
 normalize-*.js
 trace-*.js
 pre-test-check.js

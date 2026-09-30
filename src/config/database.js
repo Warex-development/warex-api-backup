@@ -6,13 +6,20 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+const isVercel = Boolean(process.env.VERCEL);
+
 // Create PostgreSQL pool with Supabase credentials and SSL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false // Required for Supabase
-  }
+  },
+  // Vercel serverless optimization: prevent connection exhaustion on Supabase
+  max: isVercel ? 2 : 10,
+  idleTimeoutMillis: isVercel ? 5000 : 30000,
+  connectionTimeoutMillis: 5000
 });
+
 
 // Connection event handlers
 pool.on('connect', () => {
