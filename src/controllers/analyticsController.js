@@ -191,14 +191,24 @@ exports.getInventoryAnalytics = async (req, res) => {
         COUNT(*) as total_listings,
         COUNT(CASE WHEN status='approved' THEN 1 END) as approved,
         COUNT(CASE WHEN status IN ('pending', 'pending_review') THEN 1 END) as pending,
-        COUNT(CASE WHEN status='sold' THEN 1 END) as sold
+        COUNT(CASE WHEN status='sold' THEN 1 END) as sold,
+        COALESCE(SUM(
+          CASE 
+            WHEN status='approved' AND bid_price IS NOT NULL AND bid_price > 0 THEN bid_price * COALESCE(quantity, 1)
+            WHEN status='approved' AND seller_bid_price IS NOT NULL AND seller_bid_price > 0 THEN seller_bid_price * COALESCE(quantity, 1)
+            ELSE 0 
+          END
+        ), 0) as total_pool_value
       FROM listings
     `;
     const result = await pool.query(query);
     
     return res.status(200).json({
       message: 'Inventory analytics retrieved',
-      data: result.rows[0]
+      data: {
+        ...result.rows[0],
+        total_pool_value: parseFloat(result.rows[0].total_pool_value) || 0
+      }
     });
   } catch (error) {
     console.error('Analytics Error (Inventory):', error.message);
