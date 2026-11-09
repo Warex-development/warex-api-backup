@@ -151,8 +151,10 @@ USERS_TABLE_FIX_REPORT.md
 ################################################################################
 # TEMP / DEBUG SCRIPTS (do not commit)
 ################################################################################
-check_schema.js
-check-admin.js
+check_*.js
+check-*.js
+apply_*.js
+verify_*.js
 create_leads_table.js
 clear_*.js
 compare_*.js
