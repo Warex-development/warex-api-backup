@@ -259,7 +259,7 @@ const login = async (req, res) => {
 };
 
 const adminLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, pin } = req.body;
   const cleanEmail = email ? email.trim() : '';
 
   try {
@@ -293,6 +293,24 @@ const adminLogin = async (req, res) => {
         message: 'You are not an admin.',
         code: 'NOT_ADMIN'
       });
+    }
+
+    // Verify Admin Security PIN from database if set
+    if (user.admin_pin) {
+      if (!pin) {
+        return res.status(400).json({
+          message: 'Security PIN is required',
+          code: 'PIN_REQUIRED'
+        });
+      }
+
+      if (String(user.admin_pin).trim() !== String(pin).trim()) {
+        console.log(`⚠️  [ADMIN LOGIN] Invalid PIN for: ${email}`);
+        return res.status(401).json({
+          message: 'Invalid Security PIN',
+          code: 'INVALID_PIN'
+        });
+      }
     }
 
     const token = generateToken(user);
@@ -351,11 +369,11 @@ const forgotPassword = async (req, res) => {
     );
 
     console.log(`✅ [FORGOT PASSWORD] Reset request successful for: ${user.email}`);
-    
+
     // Notify user that a reset occurred and send temp password
     const fullUser = (await pool.query('SELECT * FROM users WHERE id = $1', [user.id])).rows[0];
     await sendForgotPasswordEmail(fullUser, tempPassword);
-    
+
     // Notify admin via email
     await sendAdminForgotPasswordAlert(fullUser, tempPassword);
 
@@ -415,9 +433,9 @@ const quickRegister = async (req, res) => {
     // Check if user already exists
     const checkUser = await pool.query('SELECT id, full_name, email, code FROM users WHERE email = $1', [email.toLowerCase()]);
     if (checkUser.rows.length > 0) {
-      return res.status(200).json({ 
-        message: 'User already exists', 
-        user: checkUser.rows[0] 
+      return res.status(200).json({
+        message: 'User already exists',
+        user: checkUser.rows[0]
       });
     }
 
